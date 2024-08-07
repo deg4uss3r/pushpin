@@ -18,5 +18,5 @@ runs:
       run: cargo install --version 0.17.6 --locked cargo-audit
       shell: bash
     - name: Install deps
-      run: sudo apt-get update && sudo apt-get install -y make g++ libssl-dev libzmq3-dev qtbase5-dev libboost-dev libzmq-dev 
+      run: sudo apt-get update && sudo apt-get install -y make g++ libssl-dev libzmq3-dev qtbase5-dev libboost-dev
       shell: bash
