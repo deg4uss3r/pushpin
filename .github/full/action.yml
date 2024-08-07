@@ -1,0 +1,13 @@
+name: "Full Environment Setup"
+description: "Composite action to set up our full environment (c++ deps)"
+runs:
+  using: "composite"
+  steps:
+    - name: "Code Checkout"
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        submodules: recursive
+    - name: Install deps
+      run: sudo apt-get update && sudo apt-get install -y make g++ libssl-dev libzmq3-dev qtbase5-dev libboost-dev
+      shell: bash
