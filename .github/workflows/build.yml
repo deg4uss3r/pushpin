@@ -1,7 +1,5 @@
 name: Build
 on:
-    pull_request:
-        types: [opened, reopened, ready_for_review, review_requested] 
     workflow_run:
         workflows: ["Check"]
         branches: [main]
