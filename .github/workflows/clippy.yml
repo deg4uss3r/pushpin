@@ -1,7 +1,15 @@
-on: pull_request
+on:
+    pull_request:
+        types: [opened, reopened, ready_for_review, review_requested] 
+    workflow_run:
+        workflows: ["Check"]
+        branches: [main]
+        types: 
+          - completed
 name: Clippy
 jobs:
   test:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     strategy:
       matrix:
         platform: [ubuntu-20.04]
@@ -26,4 +34,3 @@ jobs:
     - name: clippy
       run: cargo clippy -- -D warnings
       shell: bash
-

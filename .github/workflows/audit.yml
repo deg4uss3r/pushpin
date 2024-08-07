@@ -1,7 +1,15 @@
-on: pull_request
 name: Audit
+on:
+    pull_request:
+        types: [opened, reopened, ready_for_review, review_requested] 
+    workflow_run:
+        workflows: ["Check"]
+        branches: [main]
+        types: 
+          - completed
 jobs:
   test:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     strategy:
       matrix:
         platform: [ubuntu-20.04]

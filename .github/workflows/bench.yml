@@ -1,7 +1,15 @@
-on: pull_request
 name: Bench
+on:
+    pull_request:
+        types: [opened, reopened, ready_for_review, review_requested] 
+    workflow_run:
+        workflows: ["Check"]
+        branches: [main]
+        types: 
+          - completed
 jobs:
-  test:
+  bench:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     strategy:
       matrix:
         platform: [ubuntu-20.04]
@@ -23,6 +31,6 @@ jobs:
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-    - name: cargo bench --no-run
+    - name: bench
       run: RUSTFLAGS="-D warnings" cargo bench --no-run
       shell: bash
