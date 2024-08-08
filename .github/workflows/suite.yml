@@ -105,6 +105,9 @@ jobs:
         submodules: recursive
     - name: "Environment Setup"
       uses: ./.github/base
+    - name: Install audit
+      run: cargo install --version 0.17.6 --locked cargo-audit
+      shell: bash
     - name: audit
       run: cargo audit
       shell: bash
