@@ -62,6 +62,12 @@ jobs:
     runs-on: ${{ matrix.platform }}
     needs: check
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: "Environment Setup"
+      uses: ./.github/base
     - name: Cache cargo registry
       uses: actions/cache@v4
       with:
@@ -73,7 +79,7 @@ jobs:
         path: ~/.cargo/git
         key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
     - name: build
-      run: RUSTFLAGS="-D warnings" make
+      run: RUSTFLAGS="-D warnings" cargo b
       shell: bash
   audit:
     strategy:
@@ -155,4 +161,33 @@ jobs:
         key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
     - name: bench
       run: RUSTFLAGS="-D warnings" cargo bench --no-run
+      shell: bash
+  build-full:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    needs: [build, audit, test]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: "Environment Setup"
+      uses: ./.github/base
+    - name: "Full Environment Setup"
+      uses: ./.github/full
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+    - name: Cache cargo index
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+    - name: build
+      run: RUSTFLAGS="-D warnings" make build
       shell: bash
