@@ -4,6 +4,27 @@ on:
     branches: 
       - main
 jobs:
+  setup:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: "Code Checkout"
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        submodules: recursive
+    - name: "Rust Toolchain Setup"
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+        targets: x86_64-unknown-linux-gnu
+        components: rustfmt, clippy
+    - name: Install deps
+      run: sudo apt-get update && sudo apt-get install -y make g++ libssl-dev libzmq3-dev qtbase5-dev libboost-dev
+      shell: bash
   check:
     strategy:
       fail-fast: true
@@ -15,8 +36,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: "Environment Setup"
-      uses: ./.github/base
+    - name: check
+      run: cargo c
+      shell: bash
     - name: Cache cargo registry
       uses: actions/cache@v4
       with:
@@ -27,9 +49,6 @@ jobs:
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-    - name: check
-      run: cargo c
-      shell: bash
   clippy:
     strategy:
       fail-fast: true
@@ -42,8 +61,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: "Environment Setup"
-      uses: ./.github/base
     - name: clippy
       run: cargo clippy -- -D warnings
       shell: bash
@@ -69,8 +86,6 @@ jobs:
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-    - name: "Environment Setup"
-      uses: ./.github/base
     - name: fmt
       run: cargo fmt --check
       shell: bash
@@ -86,8 +101,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: "Environment Setup"
-      uses: ./.github/base
     - name: build
       run: RUSTFLAGS="-D warnings" cargo b
       shell: bash
@@ -103,8 +116,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: "Environment Setup"
-      uses: ./.github/base
     - name: Install audit
       run: cargo install --version 0.17.6 --locked cargo-audit
       shell: bash
@@ -123,8 +134,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: "Environment Setup"
-      uses: ./.github/base
     - name: test
       run: cargo test --all --all-features 
       shell: bash
@@ -140,8 +149,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: "Environment Setup"
-      uses: ./.github/base
     - name: bench
       run: RUSTFLAGS="-D warnings" cargo bench --no-run
       shell: bash
@@ -157,8 +164,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: "Environment Setup"
-      uses: ./.github/base
     - name: build
       run: RUSTFLAGS="-D warnings" make build
       shell: bash
