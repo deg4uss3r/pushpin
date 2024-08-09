@@ -16,6 +16,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
     - name: check
       run: cargo c
       shell: bash
@@ -42,6 +45,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
     - name: clippy
       run: cargo clippy -- -D warnings
       shell: bash
@@ -68,6 +74,9 @@ jobs:
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+    - name: rustup select
+      run: rustup default stable
+      shell: bash    
     - name: fmt
       run: cargo fmt --check
       shell: bash
@@ -84,6 +93,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
     - name: build
       run: RUSTFLAGS="-D warnings" cargo b
       shell: bash
@@ -100,6 +112,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
     - name: audit
       run: cargo audit
       shell: bash
@@ -116,6 +131,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
     - name: test
       run: cargo test --all --all-features 
       shell: bash
@@ -132,6 +150,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
     - name: bench
       run: RUSTFLAGS="-D warnings" cargo bench --no-run
       shell: bash
@@ -148,6 +169,9 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
     - name: build
       run: RUSTFLAGS="-D warnings" make build
       shell: bash
