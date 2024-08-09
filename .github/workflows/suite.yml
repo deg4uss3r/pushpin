@@ -1,0 +1,177 @@
+name: CI
+on:
+  pull_request:
+    branches: 
+      - main
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
+    - name: check
+      run: cargo c
+      shell: bash
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+    - name: Cache cargo index
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+  clippy:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
+    needs: check
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
+    - name: clippy
+      run: cargo clippy -- -D warnings
+      shell: bash
+  lint:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
+    needs: check
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+    - name: Cache cargo index
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+    - name: rustup select
+      run: rustup default stable
+      shell: bash    
+    - name: fmt
+      run: cargo fmt --check
+      shell: bash
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
+    needs: check
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
+    - name: build
+      run: RUSTFLAGS="-D warnings" cargo b
+      shell: bash
+  audit:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
+    needs: build
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
+    - name: audit
+      run: cargo audit
+      shell: bash
+  test:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
+    needs: build
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
+    - name: test
+      run: cargo test --all --all-features 
+      shell: bash
+  benchmark:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
+    needs: build
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
+    - name: bench
+      run: RUSTFLAGS="-D warnings" cargo bench --no-run
+      shell: bash
+  build-full:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [ubuntu-20.04]
+    runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
+    needs: [audit, test]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: rustup select
+      run: rustup default stable
+      shell: bash
+    - name: build
+      run: RUSTFLAGS="-D warnings" make build
+      shell: bash
