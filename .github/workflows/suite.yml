@@ -10,6 +10,7 @@ jobs:
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
     steps:
     - name: "Code Checkout"
       uses: actions/checkout@v4
@@ -22,15 +23,13 @@ jobs:
         toolchain: stable
         targets: x86_64-unknown-linux-gnu
         components: rustfmt, clippy
-    - name: Install deps
-      run: sudo apt-get update && sudo apt-get install -y make g++ libssl-dev libzmq3-dev qtbase5-dev libboost-dev
-      shell: bash
   check:
     strategy:
       fail-fast: true
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
     needs: setup
     steps:
     - name: Checkout code
@@ -56,6 +55,7 @@ jobs:
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
     needs: check
     steps:
     - name: Checkout code
@@ -71,6 +71,7 @@ jobs:
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
     needs: check
     steps:
     - name: Checkout code
@@ -96,6 +97,7 @@ jobs:
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
     needs: check
     steps:
     - name: Checkout code
@@ -111,15 +113,13 @@ jobs:
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
     needs: build
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: Install audit
-      run: cargo install --version 0.17.6 --locked cargo-audit
-      shell: bash
     - name: audit
       run: cargo audit
       shell: bash
@@ -129,6 +129,7 @@ jobs:
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
     needs: build
     steps:
     - name: Checkout code
@@ -144,6 +145,7 @@ jobs:
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
+    container: deg4uss3r42/fanout-base:latest
     needs: build
     steps:
     - name: Checkout code
@@ -159,7 +161,8 @@ jobs:
       matrix:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
-    needs: [build, audit, test]
+    container: deg4uss3r42/fanout-base:latest
+    needs: [audit, test]
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
