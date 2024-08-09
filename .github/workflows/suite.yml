@@ -4,25 +4,6 @@ on:
     branches: 
       - main
 jobs:
-  setup:
-    strategy:
-      fail-fast: true
-      matrix:
-        platform: [ubuntu-20.04]
-    runs-on: ${{ matrix.platform }}
-    container: deg4uss3r42/fanout-base:latest
-    steps:
-    - name: "Code Checkout"
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        submodules: recursive
-    - name: "Rust Toolchain Setup"
-      uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: stable
-        targets: x86_64-unknown-linux-gnu
-        components: rustfmt, clippy
   check:
     strategy:
       fail-fast: true
@@ -30,7 +11,6 @@ jobs:
         platform: [ubuntu-20.04]
     runs-on: ${{ matrix.platform }}
     container: deg4uss3r42/fanout-base:latest
-    needs: setup
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
