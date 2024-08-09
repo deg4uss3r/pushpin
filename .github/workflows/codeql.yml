@@ -12,6 +12,7 @@ jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
     runs-on: 'ubuntu-latest'
+    container: deg4uss3r42/fanout-base:latest
     timeout-minutes: 15
     permissions:
       # required for all workflows
@@ -35,10 +36,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: "Environment Setup"
-      uses: ./.github/base
-    - name: "Full Environment Setup"
-      uses: ./.github/full
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3

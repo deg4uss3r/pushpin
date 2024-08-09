@@ -15,4 +15,6 @@ RUN cargo install --version 0.17.6 --locked cargo-audit
 
 RUN rustup component add rustfmt
 
-RUN rustup component add clippy 
+RUN rustup component add clippy
+
+RUN rustup default stable
